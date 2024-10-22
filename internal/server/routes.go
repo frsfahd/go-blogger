@@ -26,6 +26,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.HandleFunc("GET /posts", Chain(s.ListPostsHandler, Logging()))
 	mux.HandleFunc("GET /posts/{id}", Chain(s.GetPostHandler, Logging()))
 	mux.HandleFunc("PUT /posts/{id}", Chain(s.EditPostHandler, Auth(), Logging()))
+	mux.HandleFunc("DELETE /posts/{id}", Chain(s.DeletePost, Auth(), Logging()))
 
 	return mux
 }
@@ -236,7 +237,29 @@ func (s *Server) EditPostHandler(w http.ResponseWriter, r *http.Request) {
 		Data:    updatedPost,
 	}
 	json.NewEncoder(w).Encode(res)
-	return
+}
+
+func (s *Server) DeletePost(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.PathValue("id"))
+
+	delPost, err := s.db.Query().DeletePost(context.Background(), int32(id))
+
+	var res Response
+
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		w.WriteHeader(http.StatusNotFound)
+		res = Response{
+			Message: "post not found",
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	res = Response{
+		Message: "post deleted",
+		Data:    delPost,
+	}
+	json.NewEncoder(w).Encode(res)
 }
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
