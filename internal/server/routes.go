@@ -22,6 +22,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.HandleFunc("POST /login", Chain(s.LoginHandler, Logging()))
 
 	mux.HandleFunc("POST /posts", Chain(s.AddPostHandler, Auth(), Logging()))
+	mux.HandleFunc("GET /posts", Chain(s.ListPostsHandler, Logging()))
 
 	return mux
 }
@@ -129,6 +130,26 @@ func (s *Server) AddPostHandler(w http.ResponseWriter, r *http.Request) {
 		Data:    newPost,
 	}
 
+	json.NewEncoder(w).Encode(res)
+}
+
+func (s *Server) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
+	var res Response
+
+	listPost, err := s.db.Query().ListPosts(context.Background())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		res = Response{
+			Message: err.Error(),
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	res = Response{
+		Message: "success",
+		Data:    listPost,
+	}
 	json.NewEncoder(w).Encode(res)
 }
 
