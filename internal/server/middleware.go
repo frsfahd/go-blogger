@@ -20,8 +20,7 @@ func Chain(f http.HandlerFunc, middlewares ...Middleware) http.HandlerFunc {
 func Logging() Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			slog.Info(r.RemoteAddr, r.Method, r.URL.Path)
-
+			slog.Info(r.RemoteAddr, r.Method, r.RequestURI)
 			next(w, r)
 		}
 	}
