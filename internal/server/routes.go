@@ -160,13 +160,17 @@ func (s *Server) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	//check if slice is empty
 	if listPost == nil {
-		listPost = []sqlc.Post{}
+		res = Response{
+			Message: "post not found",
+			Data:    []sqlc.Post{},
+		}
+	} else {
+		res = Response{
+			Message: "success",
+			Data:    listPost,
+		}
 	}
 
-	res = Response{
-		Message: "success",
-		Data:    listPost,
-	}
 	json.NewEncoder(w).Encode(res)
 }
 
