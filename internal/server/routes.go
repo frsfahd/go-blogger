@@ -21,7 +21,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.HandleFunc("POST /register", Chain(s.RegisterHandler, Logging()))
 	mux.HandleFunc("POST /login", Chain(s.LoginHandler, Logging()))
 
-	mux.HandleFunc("POST /posts", Chain(s.AddPostHandler, Logging()))
+	mux.HandleFunc("POST /posts", Chain(s.AddPostHandler, Auth(), Logging()))
 
 	return mux
 }
