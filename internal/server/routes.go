@@ -136,7 +136,17 @@ func (s *Server) AddPostHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var res Response
 
-	listPost, err := s.db.Query().ListPosts(context.Background())
+	keyword := r.URL.Query().Get("search")
+
+	var listPost []sqlc.Post
+	var err error
+
+	if keyword != "" {
+		listPost, err = s.db.Query().FilterPosts(context.Background(), sql.NullString{Valid: true, String: keyword})
+	} else {
+		listPost, err = s.db.Query().ListPosts(context.Background())
+	}
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		res = Response{
@@ -144,6 +154,11 @@ func (s *Server) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		json.NewEncoder(w).Encode(res)
 		return
+	}
+
+	//check if slice is empty
+	if listPost == nil {
+		listPost = []sqlc.Post{}
 	}
 
 	res = Response{
