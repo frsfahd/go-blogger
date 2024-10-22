@@ -25,6 +25,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.HandleFunc("POST /posts", Chain(s.AddPostHandler, Auth(), Logging()))
 	mux.HandleFunc("GET /posts", Chain(s.ListPostsHandler, Logging()))
 	mux.HandleFunc("GET /posts/{id}", Chain(s.GetPostHandler, Logging()))
+	mux.HandleFunc("PUT /posts/{id}", Chain(s.EditPostHandler, Auth(), Logging()))
 
 	return mux
 }
@@ -193,6 +194,49 @@ func (s *Server) GetPostHandler(w http.ResponseWriter, r *http.Request) {
 		Data:    post,
 	}
 	json.NewEncoder(w).Encode(res)
+}
+
+func (s *Server) EditPostHandler(w http.ResponseWriter, r *http.Request) {
+	var post Post
+	id, _ := strconv.Atoi(r.PathValue("id"))
+	json.NewDecoder(r.Body).Decode(&post)
+
+	//validate input
+	var category = sql.NullString{
+		Valid: false,
+	}
+	if post.Category != "" {
+		category = sql.NullString{
+			Valid:  true,
+			String: post.Category,
+		}
+	}
+
+	updatedPost, err := s.db.Query().UpdatePost(context.Background(), sqlc.UpdatePostParams{
+		ID:       int32(id),
+		Title:    post.Title,
+		Content:  post.Content,
+		Category: category,
+		Tags:     post.Tags,
+	})
+
+	var res Response
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		res = Response{
+			Message: err.Error(),
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	res = Response{
+		Message: "post updated",
+		Data:    updatedPost,
+	}
+	json.NewEncoder(w).Encode(res)
+	return
 }
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
