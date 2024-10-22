@@ -92,7 +92,9 @@ func (q *Queries) DeletePost(ctx context.Context, id int32) (Post, error) {
 
 const filterPosts = `-- name: FilterPosts :many
 SELECT id, title, content, category, tags, createdat, updatedat FROM posts 
-WHERE title ILIKE '%' || $1 || '%'
+WHERE title ILIKE '%' || $1 || '%' 
+   OR content ILIKE '%' || $1 || '%' 
+   OR category ILIKE '%' || $1 || '%'
 `
 
 func (q *Queries) FilterPosts(ctx context.Context, dollar_1 sql.NullString) ([]Post, error) {

@@ -32,5 +32,8 @@ WHERE id = $1;
 
 -- name: FilterPosts :many
 SELECT * FROM posts 
-WHERE title ILIKE '%' || $1 || '%';
+WHERE title ILIKE '%' || $1 || '%' 
+   OR content ILIKE '%' || $1 || '%' 
+   OR category ILIKE '%' || $1 || '%';
+
 
