@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/frsfahd/go-blogger/internal/sqlc"
 	"golang.org/x/crypto/bcrypt"
@@ -23,6 +24,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	mux.HandleFunc("POST /posts", Chain(s.AddPostHandler, Auth(), Logging()))
 	mux.HandleFunc("GET /posts", Chain(s.ListPostsHandler, Logging()))
+	mux.HandleFunc("GET /posts/{id}", Chain(s.GetPostHandler, Logging()))
 
 	return mux
 }
@@ -164,6 +166,27 @@ func (s *Server) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 	res = Response{
 		Message: "success",
 		Data:    listPost,
+	}
+	json.NewEncoder(w).Encode(res)
+}
+
+func (s *Server) GetPostHandler(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.PathValue("id"))
+
+	var res Response
+
+	post, err := s.db.Query().GetPost(context.Background(), int32(id))
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		res = Response{
+			Message: "post not found",
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	res = Response{
+		Message: "success",
+		Data:    post,
 	}
 	json.NewEncoder(w).Encode(res)
 }
