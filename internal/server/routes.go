@@ -21,6 +21,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.HandleFunc("POST /register", Chain(s.RegisterHandler, Logging()))
 	mux.HandleFunc("POST /login", Chain(s.LoginHandler, Logging()))
 
+	mux.HandleFunc("POST /posts", Chain(s.AddPostHandler, Logging()))
+
 	return mux
 }
 
@@ -89,6 +91,42 @@ func (s *Server) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			Message: "user added",
 			Data:    newUser,
 		}
+	}
+
+	json.NewEncoder(w).Encode(res)
+}
+
+func (s *Server) AddPostHandler(w http.ResponseWriter, r *http.Request) {
+	var post Post
+	json.NewDecoder(r.Body).Decode(&post)
+
+	var res Response
+
+	//validate input
+	var category = sql.NullString{
+		Valid: false,
+	}
+	if post.Category != "" {
+		category = sql.NullString{
+			Valid:  true,
+			String: post.Category,
+		}
+	}
+
+	newPost, err := s.db.Query().AddPost(context.Background(), sqlc.AddPostParams{Title: post.Title, Content: post.Content, Category: category, Tags: post.Tags})
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		res = Response{
+			Message: err.Error(),
+		}
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+
+	res = Response{
+		Message: "new post added",
+		Data:    newPost,
 	}
 
 	json.NewEncoder(w).Encode(res)

@@ -4,6 +4,7 @@ This project intended to showcases the implementation of Golang standard library
 
 - /login
 - /register
+- /posts
 - /health
 
 Several libraries/tools are used along with Golang stdlib:
