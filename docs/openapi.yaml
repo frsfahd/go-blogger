@@ -4,6 +4,8 @@ info:
   description: |-
     This is a sample Blog Rest API Server based on the OpenAPI 3.0 specification.
 
+    source project: [github.com/frsfahd/go-blogger](https://github.com/frsfahd/go-blogger)
+
   # contact:
   #   email: apiteam@swagger.io
   # license:
