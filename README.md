@@ -1,21 +1,31 @@
 # Project go-blogger
 
-This project intended to showcases the implementation of Golang standard library for building Restful API. These are available endpoints :
-
-- /login
-- /register
-- /posts
-- /health
+This is a RESTful API for performing CRUD blog post operation. The http service built based on Golang net/http.
 
 Several libraries/tools are used along with Golang stdlib:
 
 - github.com/dotenv-org/godotenvvault (for loading .env in a more secure way)
-- github.com/golang-jwt/jwt/v5 (for JWT auth)
+- <s>github.com/golang-jwt/jwt/v5 (for JWT auth)</s>
 - SQLC (for database things)
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+To run this project locally, it is necessary to have golang installed in local machine and an instance of Postgres,
+
+1. clone this project
+
+```bash
+git clone https://github.com/frsfahd/go-blogger.git
+```
+
+2. create .env file in project root based on env-sample (fill with your own data). I'm using [dotenvault](https://www.dotenv.org/) for managing env var in remote environment (so ignore the .env.vault)
+3. install dependencies
+
+```bash
+go mod download
+```
+
+4. run with `make run` or `make watch` (see the Makefile)
 
 ## MakeFile
 
@@ -37,34 +47,10 @@ Run the application
 make run
 ```
 
-Create DB container
-
-```bash
-make docker-run
-```
-
-Shutdown DB Container
-
-```bash
-make docker-down
-```
-
-DB Integrations Test:
-
-```bash
-make itest
-```
-
 Live reload the application:
 
 ```bash
 make watch
-```
-
-Run the test suite:
-
-```bash
-make test
 ```
 
 Clean up binary from the last build:
