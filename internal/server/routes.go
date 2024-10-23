@@ -21,15 +21,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.FS(docs.DocsFS))))
 	mux.HandleFunc("/health", s.healthHandler)
 
-	mux.HandleFunc("/hello", Chain(s.HelloWorldHandler, Auth(), Logging()))
-	mux.HandleFunc("POST /register", Chain(s.RegisterHandler, Logging()))
-	mux.HandleFunc("POST /login", Chain(s.LoginHandler, Logging()))
+	mux.HandleFunc("/hello", Chain(s.HelloWorldHandler, Logging()))
+	// mux.HandleFunc("POST /register", Chain(s.RegisterHandler, Logging()))
+	// mux.HandleFunc("POST /login", Chain(s.LoginHandler, Logging()))
 
-	mux.HandleFunc("POST /posts", Chain(s.AddPostHandler, Auth(), Logging()))
+	mux.HandleFunc("POST /posts", Chain(s.AddPostHandler, Logging()))
 	mux.HandleFunc("GET /posts", Chain(s.ListPostsHandler, Logging()))
 	mux.HandleFunc("GET /posts/{id}", Chain(s.GetPostHandler, Logging()))
-	mux.HandleFunc("PUT /posts/{id}", Chain(s.EditPostHandler, Auth(), Logging()))
-	mux.HandleFunc("DELETE /posts/{id}", Chain(s.DeletePost, Auth(), Logging()))
+	mux.HandleFunc("PUT /posts/{id}", Chain(s.EditPostHandler, Logging()))
+	mux.HandleFunc("DELETE /posts/{id}", Chain(s.DeletePost, Logging()))
 
 	return mux
 }
