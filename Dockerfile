@@ -13,4 +13,4 @@ WORKDIR /app
 COPY --from=builder /go/bin/main /go/src/app/.env.vault /go/src/app/docs/ ./
 # LABEL Name=goblogger Version=0.0.1
 EXPOSE 8080
-ENTRYPOINT [ "/main" ]
+ENTRYPOINT [ "./main" ]
