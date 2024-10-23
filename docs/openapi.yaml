@@ -1,0 +1,355 @@
+openapi: 3.1.0
+info:
+  title: Go-Blogger
+  description: |-
+    This is a sample Blog Rest API Server based on the OpenAPI 3.0 specification.
+
+  # contact:
+  #   email: apiteam@swagger.io
+  # license:
+  #   name: Apache 2.0
+  #   url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+tags:
+  - name: post
+    description: Everything about your blog post
+paths:
+  /posts:
+    post:
+      tags:
+        - post
+      summary: Create a new post
+      requestBody:
+        $ref: '#/components/requestBodies/PostRequest'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectPostResponse'
+              examples:
+                ObjectExample:
+                  $ref: '#/components/examples/ObjectExample'
+        '500':
+          description: server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+    get:
+      tags:
+        - post
+      summary: Retrieve a list of posts
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search term for posts
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayPostResponse'
+              examples:
+                ArrayExample:
+                  $ref: '#/components/examples/ArrayExample'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+  /posts/{id}:
+    get:
+      tags:
+        - post
+      summary: Retrieve a specific post by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the post to retrieve
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectPostResponse'
+              examples:
+                ObjectExample:
+                  $ref: '#/components/examples/ObjectExample'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+    put:
+      tags:
+        - post
+      summary: Update a specific post by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the post to update
+      requestBody:
+        $ref: '#/components/requestBodies/PostRequest'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectPostResponse'
+              examples:
+                ObjectExample:
+                  $ref: '#/components/examples/ObjectExample'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+    delete:
+      tags:
+        - post
+      summary: Delete a specific post by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the post to delete
+      responses:
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectPostResponse'
+              examples:
+                ObjectExample:
+                  $ref: '#/components/examples/ObjectExample'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              examples:
+                NullDataExample:
+                  $ref: '#/components/examples/NullDataExample'
+
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        String:
+          type: string
+        Valid:
+          type: boolean
+      example: { 'String': 'category-1', 'Valid': true }
+    Timestamp:
+      type: object
+      properties:
+        Time:
+          type: string
+          format: date-time
+        Valid:
+          type: boolean
+      example: { 'String': '2024-10-23T04:07:38', 'Valid': true }
+    Post:
+      type: object
+      properties:
+        ID:
+          type: integer
+          format: int32
+          example: 2
+        Title:
+          type: string
+          example: some title
+        Content:
+          type: string
+          example: some content...
+        Category:
+          $ref: '#/components/schemas/Category'
+        Tags:
+          type: array
+          items:
+            type: string
+        CreatedAt:
+          $ref: '#/components/schemas/Timestamp'
+        UpdatedAt:
+          $ref: '#/components/schemas/Timestamp'
+
+    PostResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ArrayPostResponse:
+      type: object
+      description: Return an array of post
+      properties:
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+
+    ObjectPostResponse:
+      type: object
+      description: Return a single post
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Post'
+
+  requestBodies:
+    PostRequest:
+      description: Post request body
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: some title
+              content:
+                type: string
+                example: some content...
+              category:
+                type: string
+                example: category-1
+              tags:
+                type: array
+                items:
+                  type: string
+                example: ['tag-1', 'tag-2']
+            required:
+              - title
+              - content
+  # responses:
+  #   PostListResponse:
+  #     description: List of posts
+  #     content:
+  #       application/json:
+  #         schema:
+  #           $ref: '#/components/schemas/PostResponse'
+
+  #   PostObjectResponse:
+  #     description: Single post response
+  #     content:
+  #       application/json:
+  #         schema:
+  #           $ref: '#/components/schemas/PostResponse'
+  examples:
+    ArrayExample:
+      value:
+        message: 'success'
+        data:
+          [
+            {
+              ID: 1,
+              Title: 'First Post',
+              Content: 'Lorem ipsum',
+              Category: { String: 'News', Valid: true },
+              Tags: ['news', 'announcement'],
+              CreatedAt: { Time: '2024-10-23T11:11:11Z', Valid: true },
+              UpdatedAt: { Time: '2024-10-23T11:11:11Z', Valid: true },
+            },
+            {
+              ID: 2,
+              Title: 'Second Post',
+              Content: 'Dolor sit amet',
+              Category: { String: 'Tech', Valid: true },
+              Tags: ['tech'],
+              CreatedAt: { Time: '2024-10-23T11:12:11Z', Valid: true },
+              UpdatedAt: { Time: '2024-10-23T11:12:11Z', Valid: true },
+            },
+          ]
+    ObjectExample:
+      value:
+        message: 'success'
+        data:
+          {
+            ID: 3,
+            Title: 'Third Post',
+            Content: 'Consectetur adipiscing elit',
+            Category: { String: 'Health', Valid: true },
+            Tags: ['health'],
+            CreatedAt: { Time: '2024-10-23T11:13:11Z', Valid: true },
+            UpdatedAt: { Time: '2024-10-23T11:13:11Z', Valid: true },
+          }
+    NullDataExample:
+      value:
+        message: 'error'

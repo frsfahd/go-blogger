@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/frsfahd/go-blogger/docs"
 	"github.com/frsfahd/go-blogger/internal/sqlc"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,6 +17,8 @@ import (
 func (s *Server) RegisterRoutes() http.Handler {
 
 	mux := http.NewServeMux()
+
+	mux.Handle("/docs/", http.StripPrefix("/docs/", http.FileServer(http.FS(docs.DocsFS))))
 	mux.HandleFunc("/health", s.healthHandler)
 
 	mux.HandleFunc("/hello", Chain(s.HelloWorldHandler, Auth(), Logging()))
