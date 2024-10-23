@@ -26,7 +26,12 @@ func NewServer() *http.Server {
 
 		db: database.New(),
 	}
-	slog.Info("database connected ✅")
+
+	// check status DB
+	stats := NewServer.db.Health()
+	if stats["status"] == "up" {
+		slog.Info("database connected ✅")
+	}
 
 	// Declare Server config
 	server := &http.Server{
@@ -36,8 +41,10 @@ func NewServer() *http.Server {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
+
+	// check server status
 	host, _ := os.Hostname()
-	slog.Info("server up at ", host+":", port)
+	slog.Info("server up at ", host+":", os.Getenv("PORT"))
 
 	return server
 }

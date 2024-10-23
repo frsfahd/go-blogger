@@ -120,6 +120,7 @@ func (s *Server) AddPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	newPost, err := s.db.Query().AddPost(context.Background(), sqlc.AddPostParams{Title: post.Title, Content: post.Content, Category: category, Tags: post.Tags})
 
+	// check error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		res = Response{
@@ -151,6 +152,7 @@ func (s *Server) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 		listPost, err = s.db.Query().ListPosts(context.Background())
 	}
 
+	// check error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		res = Response{
@@ -162,6 +164,7 @@ func (s *Server) ListPostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	//check if slice is empty
 	if listPost == nil {
+		w.WriteHeader(http.StatusNotFound)
 		res = Response{
 			Message: "post not found",
 			Data:    []sqlc.Post{},
@@ -182,9 +185,19 @@ func (s *Server) GetPostHandler(w http.ResponseWriter, r *http.Request) {
 	var res Response
 
 	post, err := s.db.Query().GetPost(context.Background(), int32(id))
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		res = Response{
-			Message: "post not found",
+
+	// check error
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			res = Response{
+				Message: "post not found",
+			}
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			res = Response{
+				Message: err.Error(),
+			}
 		}
 		json.NewEncoder(w).Encode(res)
 		return
@@ -223,10 +236,18 @@ func (s *Server) EditPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	var res Response
 
+	// check error
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		res = Response{
-			Message: err.Error(),
+		if errors.Is(err, sql.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			res = Response{
+				Message: "post not found",
+			}
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			res = Response{
+				Message: err.Error(),
+			}
 		}
 		json.NewEncoder(w).Encode(res)
 		return
@@ -246,10 +267,18 @@ func (s *Server) DeletePost(w http.ResponseWriter, r *http.Request) {
 
 	var res Response
 
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		w.WriteHeader(http.StatusNotFound)
-		res = Response{
-			Message: "post not found",
+	// check error
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			res = Response{
+				Message: "post not found",
+			}
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+			res = Response{
+				Message: err.Error(),
+			}
 		}
 		json.NewEncoder(w).Encode(res)
 		return
