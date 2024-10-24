@@ -1,6 +1,6 @@
 # Project go-blogger
 
-This is a RESTful API for performing CRUD blog post operation. The http service built based on Golang net/http.
+This is a RESTful API for performing CRUD [blog post](https://roadmap.sh/projects/blogging-platform-api) operation. The http service built based on Golang net/http.
 
 Several libraries/tools are used along with Golang stdlib:
 
