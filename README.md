@@ -8,6 +8,8 @@ Several libraries/tools are used along with Golang stdlib:
 - <s>github.com/golang-jwt/jwt/v5 (for JWT auth)</s>
 - SQLC (for database things)
 
+> live demo : https://go-blogger.fly.biz.id/docs
+
 ## Getting Started
 
 To run this project locally, it is necessary to have golang installed in local machine and an instance of Postgres,
